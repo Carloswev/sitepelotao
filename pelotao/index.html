@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulário SD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    /* Reset e tipografia */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Poppins', sans-serif; background: #f0f2f5; color: #333; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+
+    /* Container do formulário */
+    .container {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 600px;
+      padding: 30px 40px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #1a202c;
+    }
+
+    form label {
+      display: block;
+      margin-top: 20px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #555;
+    }
+
+    form input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      transition: border-color 0.2s;
+    }
+    form input[type="text"]:focus {
+      outline: none;
+      border-color: #3182ce;
+    }
+
+    small {
+      display: block;
+      margin-top: 4px;
+      font-size: 0.85rem;
+      color: #a00;
+    }
+
+    /* Botão */
+    .btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      margin-top: 30px;
+      padding: 12px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: #3182ce;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    .btn:hover {
+      background-color: #276bb3;
+    }
+
+    /* Preview cartão */
+    #preview { display: none; max-width: 800px; margin: 40px auto; }
+    .card {
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+    }
+    .col {
+      flex: 1;
+      padding: 20px;
+    }
+    .col + .col {
+      border-left: 1px solid #e2e8f0;
+    }
+    .col p {
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+    }
+    .col p strong {
+      color: #1a202c;
+    }
+    .col p em {
+      color: #555;
+    }
+    .col .urgent {
+      margin-top: 20px;
+      font-style: italic;
+      color: #a00;
+      font-size: 0.9rem;
+    }
+
+    /* Impressão */
+    @media print {
+      body { background: #fff; }
+      .container { display: none; }
+      #preview { display: block; }
+      .card { box-shadow: none; border: 1px solid #000; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Formulário SD</h1>
+    <form id="dataForm">
+      <label for="nrNome">1. Nr - Nome:</label>
+      <input type="text" id="nrNome" placeholder="Exemplo: 207 Carlos Eduardo Paulo Gonçalves" required>
+
+      <label for="fatorRh">2. Fator/RH:</label>
+      <input type="text" id="fatorRh" placeholder="Exemplo: (O+)" required>
+
+      <label for="canga">3. Canga:</label>
+      <input type="text" id="canga" placeholder="Exemplo: Paula 248" required>
+
+      <label for="alergico">4. Medicamentos aos quais é alérgico:</label>
+      <input type="text" id="alergico" placeholder="Exemplo: Não tenho conhecimento" required>
+
+      <label>5. Telefones de contato - Cmt Pel:</label>
+      <small>Este campo é fixo e não pode ser alterado:</small>
+      <p style="font-weight:bold;">(51) 99274-7724 (Ten de Lima)</p>
+      <input type="hidden" id="celular" value="(51) 99274-7724 (Ten de Lima)">
+
+      <label for="resp1">Responsável 1:</label>
+      <input type="text" id="resp1" placeholder="Exemplo: (51) 99387-3665 (Silvana Costa Paulo)" required>
+
+      <label for="resp2">Responsável 2:</label>
+      <input type="text" id="resp2" placeholder="Exemplo: (51) 9387-4675 (Eduardo Cavaleri Gonçalves)" required>
+
+      <label for="contatoUrgente">6. Contato Urgente:</label>
+      <input type="text" id="contatoUrgente" placeholder="Exemplo: (51) 99877-6655" required>
+
+      <button type="button" class="btn" onclick="generatePDF()">Gerar PDF / Imprimir</button>
+    </form>
+  </div>
+
+  <div id="preview">
+    <div class="card">
+      <div class="col">
+        <p><strong>1. Nr - Nome:</strong> <span id="previewNrNome"></span></p>
+        <p><strong>2. Fator/RH:</strong> <span id="previewFatorRh"></span></p>
+        <p><strong>3. Canga:</strong> <span id="previewCanga"></span></p>
+        <p><strong>4. Medicamentos aos quais é alérgico:</strong> <span id="previewAlergico"></span></p>
+      </div>
+      <div class="col">
+        <p><strong>Telefones de contato:</strong></p>
+        <p><em>Cmt Pel:</em> <span id="previewCelular"></span></p>
+        <p><em>Responsável 1:</em> <span id="previewResp1"></span></p>
+        <p><em>Responsável 2:</em> <span id="previewResp2"></span></p>
+        <p><em>Contato Urgente:</em> <span id="previewContatoUrgente"></span></p>
+        <p class="urgent">(Nr para Ctt urgente!)</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function generatePDF() {
+      // Preencher os campos no formato CAPS LOCK
+      document.getElementById('previewNrNome').textContent = document.getElementById('nrNome').value.toUpperCase();
+      document.getElementById('previewFatorRh').textContent = document.getElementById('fatorRh').value.toUpperCase();
+      document.getElementById('previewCanga').textContent = document.getElementById('canga').value.toUpperCase();
+      document.getElementById('previewAlergico').textContent = document.getElementById('alergico').value.toUpperCase();
+      document.getElementById('previewCelular').textContent = document.getElementById('celular').value.toUpperCase();
+      document.getElementById('previewResp1').textContent = document.getElementById('resp1').value.toUpperCase();
+      document.getElementById('previewResp2').textContent = document.getElementById('resp2').value.toUpperCase();
+      document.getElementById('previewContatoUrgente').textContent = document.getElementById('contatoUrgente').value.toUpperCase();
+
+      window.print();
+    }
+  </script>
+</body>
+</html>
